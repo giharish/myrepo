@@ -1,0 +1,273 @@
+formatVersion: 1
+inputs:
+  DB_Node:
+    type: string
+    title: Name for the DB Host 
+    description: This will also be the hostname for Database Host
+  App_Node:
+    type: string
+    title: Name for the DB Host 
+    description: This will also be the hostname for Database Host
+  DB_Size:
+    type: string
+    default: small
+    enum:
+      - small
+      - medium
+  App_Size:
+    type: string
+    default: xsmall
+    enum:
+      - xsmall
+      - small
+resources:
+  Cloud_vSphere_Machine_2:
+    type: Cloud.vSphere.Machine
+    properties:
+	  newName: '${input.App_Node}'
+      customizationSpec: WIN2019_SPEC
+      image: Windows 2019
+      flavor: '${input.App_Size}'
+      networks:
+        - network: '${resource.Cloud_vSphere_Network_1.id}'
+          assignment: static
+  Cloud_vSphere_Machine_1:
+    type: Cloud.vSphere.Machine
+    properties:
+	  newName: '${input.DB_Node}'
+      image: Windows 2019
+      flavor: '${input.DB_Size}'
+formatVersion: 1
+inputs:
+  DB_Node:
+    type: string
+    title: Name for the DB Host 
+    description: This will also be the hostname for Database Host
+  App_Node:
+    type: string
+    title: Name for the DB Host 
+    description: This will also be the hostname for Database Host
+  DB_Size:
+    type: string
+    default: small
+    enum:
+      - small
+      - medium
+  App_Size:
+    type: string
+    default: xsmall
+    enum:
+      - xsmall
+      - small
+resources:
+  Cloud_vSphere_Machine_1:
+    type: Cloud.vSphere.Machine
+    properties:
+      newName: '${input.DB_Node}'
+      image: Windows 2019
+      flavor: '${input.DB_Size}'
+      networks:
+        - network: '${resource.Cloud_vSphere_Network_1.id}'
+          assignment: static
+  Cloud_vSphere_Network_1:
+    type: Cloud.vSphere.Network
+    properties:
+      networkType: existing
+
+net use \\host\share_name
+$img_device = mount-diskimage -imagepath <\\host\sharename\iso_file>
+$volInfo = $img_device | Get-Volume
+$isopath = $volInfo.DriveLetter + ":\"
+
+Start-Transcript -Append C:\PS\Logs\PSScriptLog.txt
+
+9482460349 - Manash
+
+Ca$hc0w!123
+administrator
+
+/ACTION=PrepareImage /ENU=true /QUIET=true /FEATURES=SQLENGINE,Tools /UpdateEnabled=false /INSTALLSHAREDDIR="F:\Program Files\Microsoft SQL Server" /INSTALLSHAREDWOWDIR="F:\Program Files (x86)\Microsoft SQL Server" /INSTANCEID=MSSQLSERVER /INSTANCEDIR="F:\Program Files\Microsoft SQL Server" /IAcceptSQLServerLicenseTerms=true
+/Q /ACTION=CompleteImage /INSTANCEID=MSSQLSERVER /INSTANCENAME=MSSQLSERVER /IAcceptSQLServerLicenseTerms=true /SQLSYSADMINACCOUNTS=$dbhost\${input.user} /BROWSERSVCSTARTUPTYPE=DISABLED /TCPENABLED=1'
+# This script installs SQL Server Express 2019.
+
+function Install-SQLServerExpress2019 {
+    Write-Host "Logging to Server"
+    Start-Transcript -Append C:\PS\Logs\SQL-Install.log
+    Write-Host "Starting the Installation"
+	Install-WindowsFeature -name Web-Server -IncludeManagementTools
+	Write-Host "Mounting the necessary binary"
+	net use \\host\share_name
+	$img_device = mount-diskimage -imagepath <\\host\sharename\iso_file>
+	$volInfo = $img_device | Get-Volume
+	$isopath = $volInfo.DriveLetter + ":\"
+    Write-Host "Installing SQL Server 2019..."
+    Start-Process -FilePath C:\SQL2019\SQL2019\SETUP.EXE -Args "/ACTION=INSTALL /IACCEPTSQLSERVERLICENSETERMS /QUIETSIMPLE /FEATURES=SQL,AS,IS,Tools /INSTANCENAME=SQLTEST /SQLSVCACCOUNT=VMWEXT.IN\graja
+/SQLSVCPASSWORD="VMware1!" /SQLSYSADMINACCOUNTS=VMWEXT.IN\graja /SAPWD=VMware1! /SECURITYMODE=SQL /AGTSVCACCOUNT="MyDomain\MyAccount" /AGTSVCPASSWORD="************" /ASSVCACCOUNT="MyDomain\MyAccount" /ASSVCPASSWORD="************" /ISSVCAccount="MyDomain\MyAccount" /ISSVCPASSWORD="************" /ASSYSADMINACCOUNTS="MyDomain\MyAccount"" -Verb RunAs -Wait
+    Write-Host "Installing SQL Server Management Studio..."
+	Start-Process -FilePath C:\SQL2019\SSMS-Setup-ENU.exe -Args "/QUIET"
+	Remove-Item $Path\$Installer
+}
+
+If (-NOT ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator))
+{
+  # Relaunch as an elevated process:
+  Start-Process powershell.exe "-File",('"{0}"' -f $MyInvocation.MyCommand.Path) -Verb RunAs
+  exit
+}
+# Now running elevated so launch the script:
+Tony Georgiev
+setup.exe /Q /IACCEPTSQLSERVERLICENSETERMS /ACTION="install" /PID="AAAAA-BBBBB-CCCCC-DDDDD-EEEEE" /FEATURES=SQL,AS,IS,Tools
+/INSTANCENAME=MSSQLSERVER /SQLSVCACCOUNT="MyDomain\MyAccount"
+/SQLSVCPASSWORD="************" /SQLSYSADMINACCOUNTS="MyDomain\MyAccount "
+/AGTSVCACCOUNT="MyDomain\MyAccount" /AGTSVCPASSWORD="************"
+/ASSVCACCOUNT="MyDomain\MyAccount" /ASSVCPASSWORD="************"
+/ISSVCAccount="MyDomain\MyAccount" /ISSVCPASSWORD="************"
+/ASSYSADMINACCOUNTS="MyDomain\MyAccount"
+Install-SQLServerExpress2019
+
+'${input.SelectZone == 'Zone1' ? "VM-Production" : "VM-Production-B"}'
+
+Start-Process -FilePath C:\SQL2019\SQL2019\SETUP.EXE -Args "/ACTION=INSTALL /IACCEPTSQLSERVERLICENSETERMS /QUIETSIMPLE /FEATURES=SQL,AS,IS,Tools /INSTANCENAME=${input.DBInstance} /SAPWD=VMware1! /SECURITYMODE=SQL /TCPENABLED=1" -Verb RunAs -Wait
+Start-Process -FilePath C:\SQL2019\SSMS-Setup-ENU.exe -Args "/QUIET" -Verb -Wait
+Remove-Item C:\SQL2019
+
+
+-- Get currently registered hostname: 
+SELECT @@SERVERNAME AS 'Old Server Name' 
+-- Get 
+EXEC xp_getnetname 
+-- Drop current hostname registration. 
+USE [master] GO sp_dropserver 'enter old hostname returned by @@SERVERNAME above' 
+GO 
+--Register new hostname. 
+USE [master] GO sp_addserver 'enter hostname returned from xp_getnetname above',local -- having local updates the metadata for @@SERVERNAME 
+GO 
+-- Restart SQL to apply changes
+
+
+
+$asm = [reflection.assembly]::LoadWithPartialName(“Microsoft.SqlServer.ConnectionInfo”)
+$asm = [reflection.assembly]::LoadWithPartialName(“Microsoft.SqlServer.Smo”)
+$asm = [reflection.assembly]::LoadWithPartialName(“Microsoft.SqlServer.SmoEnum”)
+$asm = [reflection.assembly]::LoadWithPartialName(“Microsoft.SqlServer.SqlEnum”)
+$asm = [reflection.assembly]::LoadWithPartialName(“Microsoft.SqlServer.WmiEnum”)
+$asm = [reflection.assembly]::LoadWithPartialName(“Microsoft.SqlServer.SqlWmiManagement”)
+
+
+function global:Set-SqlServerInstanceName{
+
+    Write “Renaming SQL Server Instance”
+
+    $smo = ‘Microsoft.SqlServer.Management.Smo.’
+
+    $server = new-object ($smo + ‘server’) .
+
+    $database = $server.Databases[“master”]
+
+    $mc = new-object ($smo + ‘WMI.ManagedComputer’) .
+
+
+    $newServerName = $mc.Name
+
+
+    $database.ExecuteNonQuery(“EXEC sp_dropserver @@SERVERNAME”)
+
+    $database.ExecuteNonQuery(“EXEC sp_addserver ‘$newServerName’, ‘local'”)
+
+
+    Write-Host “Renamed server to ‘$newServerName’`n”
+
+}
+AWS Version
+
+formatVersion: 1
+inputs:
+  servicePassword:
+    type: string
+    encrypted: true
+    description: Service Account Password
+    title: SQL Service4 Account Password
+  sqlInstanceName:
+    type: string
+    description: Name for SQL Instance
+    title: SQL Instance Name
+resources:
+  Cloud_Network_1:
+    type: Cloud.Network
+    properties:
+      networkType: existing
+      constraints:
+        - tag: 'networkZone:private'
+  Cloud_Machine_1:
+    type: Cloud.Machine
+    properties:
+      image: Windows 2019
+      flavor: medium
+      constraints:
+        - tag: 'platform:aws'
+      cloudConfig: |
+        <powershell>
+          Install-WindowsFeature -name Web-Server -IncludeManagementTools
+          c:\\temp\\sql\\setup.exe /Q /IACCEPTSQLSERVERLICENSETERMS /ACTION="install" /FEATURES=SQL,AS,IS,Tools /INSTANCENAME=${input.sqlInstanceName} /SQLSVCACCOUNT="service_vcac" /SQLSVCPASSWORD="${input.servicePassword}" /SQLSYSADMINACCOUNTS="BUILTIN\ADMINISTRATORS" /ASSYSADMINACCOUNTS="virtualiseme\service_vcac" /AGTSVCACCOUNT="service_vcac" /AGTSVCPASSWORD="${input.servicePassword}" /ASSVCACCOUNT="service_vcac" /ASSVCPASSWORD="${input.servicePassword}" /ISSVCAccount="service_vcac" /ISSVCPASSWORD="${input.servicePassword}" /SAPWD="${input.servicePassword}"
+          Set-NetFirewallProfile -Profile Domain,Public,Private -Enabled False
+        </powershell>
+      networks:
+        - network: '${resource.Cloud_Network_1.id}'
+		
+		
+Cloud Agnostic Version:
+
+formatVersion: 1
+inputs:
+  location:
+    title: Select the Cloud Zone
+    type: string
+    enum:
+      - 'vmware'
+      - 'Azure'
+      - 'AWS'
+    default: 'vmware'
+  Size:
+    type: string
+	title: Select the size of the virtual machine
+	enum:
+	  - small
+	  - medium
+	  - large
+resources:
+  Cloud_Machine_1:
+    type: Cloud.Machine
+    properties:
+      image: MSSQL
+      flavor: '${inputSize}'
+      constraints:
+        - tag: '${input.location}'
+      networks:
+        - network: '${resource.Cloud_Network_1.id}'
+          assignment: '${input.location == "vmware" ? "static" : "dynamic"}'
+          assignPublicIpAddress: false
+  Cloud_Network_1:
+    type: Cloud.Network
+    properties:
+      networkType: existing
+      constraints:
+        - tag: '${input.location}'
+
+
+Tenant ID: e39045a8-374b-4ae9-88d0-a2801daa680f
+Client ID: 5f172743-7c08-44bf-a0e9-c0e8ccfe0b9b
+Secret Value: Ly_7Q~5l9kAQsGfl.ImzUrhxgFoS8G27e~-mV
+Subscription ID: 9b9e3c1c-4980-4444-958f-71abef1992de
+
+
+Azure Cloudbase-init:
+metadata_services=cloudbaseinit.metadata.services.azureservice.AzureService
+plugins=cloudbaseinit.plugins.windows.createuser.CreateUserPlugin,cloudbaseinit.plugins.common.setuserpassword.SetUserPasswordPlugin,cloudbaseinit.plugins.common.sethostname.SetHostNamePlugin,cloudbaseinit.plugins.common.userdata.UserDataPlugin
+
+AWS Cloudbase-init:
+metadata_services=cloudbaseinit.metadata.services.ec2service.EC2Service
+plugins=cloudbaseinit.plugins.common.userdata.UserDataPlugin,cloudbaseinit.plugins.windows.createuser.CreateUserPlugin,cloudbaseinit.plugins.common.setuserpassword.SetUserPasswordPlugin,cloudbaseinit.plugins.common.sethostname.SetHostNamePlugin
+
+git restore --source=c5f567 file1/to/restore file2/to/restore
+Or if you want to restore to the content of one commit before c5f567:
+git restore --source=c5f567~1 file1/to/restore file2/to/restore

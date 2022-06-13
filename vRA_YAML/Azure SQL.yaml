@@ -1,0 +1,31 @@
+formatVersion: 1
+inputs: {}
+resources:
+  Cloud_Service_Azure_SQL_Database_1:
+    type: Cloud.Service.Azure.SQL.Database
+    dependsOn:
+      - Cloud_Service_Azure_SQL_Server_1
+    metadata:
+      layoutPosition:
+        - 0
+        - 0
+    properties:
+      name: vbcdemosql01
+      region: Central India
+      account: Azure SQL Testing
+      server_name: '${resource.Cloud_Service_Azure_SQL_Server_1.name}'
+      resource_group_name: TEST
+  Cloud_Service_Azure_SQL_Server_1:
+    type: Cloud.Service.Azure.SQL.Server
+    metadata:
+      layoutPosition:
+        - 1
+        - 1
+    properties:
+      name: vbcsqldemograja
+      region: Central India
+      account: Azure SQL Testing
+      version: '12.0'
+      administrator_login: graja
+      resource_group_name: TEST
+      administrator_login_password: VMware1!

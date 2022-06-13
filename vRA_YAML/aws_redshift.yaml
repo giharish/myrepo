@@ -1,0 +1,52 @@
+name: redshift-config
+description: Setups Redshift on AWS
+inputs:
+  region:
+    type: string
+    description: Check Cloud Zones to see the name of your region
+    title: Region Name
+    default: us-east-2
+  nodes:
+    type: integer
+    description: The value should >=1
+    title: No. of nodes
+    default: 1
+    minimum: 1
+  cluster_name:
+    type: string
+    description: Name of the cluster
+    title: Cluster name
+    pattern: '^[a-z\-]+$'
+  port:
+    type: integer
+    description: Enter the port number you would like to host the cluster
+    title: Port number
+    default: 5439
+  node_type:
+    type: string
+    description: Check AWS to see what power each node possess
+    title: Node type
+    enum:
+      - dc1.8xlarge
+      - dc2.large
+      - dc2.8xlarge
+      - ds2.8xlarge
+    default: dc2.large
+resources:
+  Cloud_Service_AWS_Redshift_Cluster_1:
+    type: Cloud.Service.AWS.Redshift.Cluster
+    properties:
+      account: Manish's AWS
+      node_type: '${input.node_type}'
+      region: '${input.region}'
+      cluster_identifier: '${input.cluster_name}'
+      port: '${input.port}'
+      cluster_version: '1.0'
+      number_of_nodes: '${input.nodes}'
+      master_password: Master$123
+      master_username: master
+      publicly_accessible: true
+      skip_final_snapshot: true
+      allow_version_upgrade: true
+      count: 1
+

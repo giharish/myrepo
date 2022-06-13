@@ -1,0 +1,60 @@
+formatVersion: 1
+inputs:
+  DB_Password:
+    type: string
+    title: Enter the password for SQL Server
+    encrypted: true
+  MachineName:
+    type: string
+    title: Name for the VM
+    description: This will also be the hostname
+  Size:
+    type: string
+    default: 'medium'
+    enum:
+      - 'medium'
+      - 'large'
+  domain:
+    type: string
+    title: Domain Name
+resources:
+  Cloud_vSphere_Machine_1:
+    type: Cloud.vSphere.Machine
+    metadata:
+      layoutPosition:
+        - 0
+        - 0
+    properties:
+      name: '${input.MachineName}'
+      image: Cloud-Init-Win
+      flavor: '${input.Size == "2CPU,4GBRAM" ? "small" : "medium"}'
+      cloudConfig: |
+        Content-Type: multipart/mixed; boundary="===123456789"
+        MIME-Version: 1.0
+        --===123456789
+        Content-Type: text/cloud-config; charset="us-ascii"
+        MIME-Version: 1.0
+        Content-Transfer-Encoding: 7bit
+        Content-Disposition: attachment; filename="cloud-config"
+        #cloud-config
+        set_hostname: ${input.MachineName}
+        --===123456789
+        Content-Type: text/x-shellscript; charset="us-ascii"
+        MIME-Version: 1.0
+        Content-Transfer-Encoding: 7bit
+        Content-Disposition: attachment; filename="doPsStuff.ps1"
+        #ps1_sysnative
+        $creds = New-Object System.Management.Automation.PSCredential "${secret.username}",(ConvertTo-SecureString -String "${secret.password}" -AsPlainText -Force)
+        Add-Computer -domainName ${input.domain} -Credential $creds -Restart
+        Install-WindowsFeature -name Web-Server -IncludeManagementTools
+      networks:
+        - network: '${resource.Cloud_vSphere_Network_1.id}'
+          assignment: static
+  Cloud_vSphere_Network_1:
+    type: Cloud.vSphere.Network
+    metadata:
+      layoutPosition:
+        - 1
+        - 0
+    properties:
+      networkType: existing

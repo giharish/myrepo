@@ -1,0 +1,70 @@
+formatVersion: 1
+inputs:
+  MachineName:
+    type: string
+    title: Enter the hostname
+  dbinstance:
+    type: string
+    title: Enter the DB Instance Name
+  dbpass:
+    type: string
+    encrypted: true
+    title: Enter the password for SA User
+  user:
+    type: string
+    title: AdminUser
+    readOnly: true
+    default: pocadmin
+resources:
+  Cloud_Machine_1:
+    type: Cloud.Machine
+    metadata:
+      layoutPosition:
+        - 0
+        - 0
+    properties:
+      name: '${input.MachineName}'
+      image: CloudInit
+      flavor: 'tier:medium'
+      remoteAccess:
+        authentication: usernamePassword
+        username: '${input.user}'
+        password: '${secret.password}'
+      networks:
+        - network: '${resource.Cloud_Network_1.id}'
+          assignment: static
+          assignPublicIpAddress: true
+      resourceGroupName: TEST
+      cloudConfig: |
+        Content-Type: multipart/mixed; boundary="===123456789"
+        MIME-Version: 1.0
+        --===123456789
+        Content-Type: text/cloud-config; charset="us-ascii"
+        MIME-Version: 1.0
+        Content-Transfer-Encoding: 7bit
+        Content-Disposition: attachment; filename="cloud-config"
+        #cloud-config
+        set_hostname: ${input.MachineName}
+        --===123456789
+        Content-Type: text/x-shellscript; charset="us-ascii"
+        MIME-Version: 1.0
+        Content-Transfer-Encoding: 7bit
+        Content-Disposition: attachment; filename="doPsStuff.ps1"
+        #ps1_sysnative
+        Start-Transcript -Append C:\PS\Logs\SQL-Install.log
+        Write-Host Disable Firewall
+        Set-NetFirewallProfile -Profile Domain,Public,Private -Enabled False
+        Write-Host "Starting Microsoft SQL 2019 Installation"
+        Start-Process -FilePath C:\SQL\SQL2019\setup.exe -Args "/Q /ACTION=INSTALL /FEATURES=SQL,Tools /IACCEPTSQLSERVERLICENSETERMS /INSTANCENAME=${input.dbinstance} /SQLSYSADMINACCOUNTS=pocadmin /SAPWD=${input.dbpass} /SECURITYMODE=SQL /TCPENABLED=1" -Verb RunAs -Wait
+        #Write-Host "Installing Azure Data Studio"
+        #Start-Process -FilePath C:\SQL\SSMS-Setup-ENU.exe -Args "/QUIET" -Verb RunAs -Wait
+        Remove-Item C:\SQL2019 -Recurse
+        Restart-Computer
+  Cloud_Network_1:
+    type: Cloud.Network
+    metadata:
+      layoutPosition:
+        - 1
+        - 0
+    properties:
+      networkType: existing
