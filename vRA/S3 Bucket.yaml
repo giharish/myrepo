@@ -1,0 +1,52 @@
+formatVersion: 1
+inputs:
+  bucketname:
+    type: string
+    title: Enter the name of S3 Bucket
+  Versioning:
+    type: boolean
+    title: Versioning
+    default: false
+  MFA_Delete:
+    type: boolean
+    title: MFA_Delete
+    default: false
+resources:
+  Cloud_Service_AWS_S3_Bucket_1:
+    type: Cloud.Service.AWS.S3.Bucket
+    metadata:
+      layoutPosition:
+        - 0
+        - 0
+    properties:
+      region: ap-south-1
+      account: AWS Account - Testing
+      bucket: '${input.bucketname}'
+      versioning:
+        - mfa_delete: '${input.MFA_Delete}'
+          enabled: '${input.Versioning}'
+      acl: private
+  Cloud_Service_AWS_S3_Bucket_Policy_1:
+    type: Cloud.Service.AWS.S3.Bucket.Policy
+    dependsOn:
+      - Cloud_Service_AWS_S3_Bucket_1
+    metadata:
+      layoutPosition:
+        - 1
+        - 0
+    properties:
+      bucket: '${resource.Cloud_Service_AWS_S3_Bucket_1.bucket}'
+      policy: |
+        {
+           "Version": "2012-10-17",
+           "Statement": [
+              {
+                "Effect": "Allow",
+                "Action": "s3:*",
+                "Resource": "${resource["Cloud_Service_AWS_S3_Bucket_1"].arn}",
+                "Principal": "*"
+              }
+            ]
+        }
+      region: ap-south-1
+      account: AWS Account - Testing
