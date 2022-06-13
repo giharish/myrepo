@@ -1,0 +1,30 @@
+{% if grains.os == 'CentOS' %}
+{% set ip_addr = grains.fqdn_ip4 %}
+install_epel:
+  pkg.installed:
+    - name: epel-release
+    
+install_redis:
+  pkg.installed:
+    - name: redis
+
+config_params_sysctl:
+  sysctl.present:
+    - name: vm.overcommit_memory
+    - value: 1
+
+disable_huge_pages:
+  cmd.run:
+    - name: sudo echo never > /sys/kernel/mm/transparent_hugepage/enabled
+    
+configure_redis:
+  cmd.run:
+    - name: ip_addr=`hostname -I` && echo bind $ip_addr >> /etc/redis.conf
+
+start_redis:
+  service.running:
+    - name: redis
+    - enable: true
+    - reload: true
+
+{% endif %}

@@ -1,0 +1,72 @@
+apache:
+  pkg.installed:
+    {% if grains['os'] == 'RedHat'%}
+    - name: httpd
+    {% endif %}
+  service.running:
+    {% if grains['os'] == 'RedHat'%}
+    - name: httpd
+	{% if grains['os'] == 'CentOS'%}
+	- name: httpd
+    {% if grains['os'] == 'Ubuntu'%}
+    - name: apache2
+	{% if grains['os'] == 'Debian'%}
+	- name: apache2
+    {% endif %}
+    - watch:
+      - pkg: apache
+      - file: /etc/httpd/conf/httpd.conf
+      - user: apache
+  user.present:
+    - uid: 87
+    - gid: 87
+    - home: /var/www/html
+    - shell: /bin/nologin
+    - require:
+      - group: apache
+  group.present:
+    - gid: 87
+    - require:
+      - pkg: apache
+
+/etc/httpd/conf/httpd.conf:
+  file.managed:
+    - source: salt://apache/httpd.conf
+    - user: root
+    - group: root
+    - mode: 644
+
+#nginx install
+
+# Name: nginx.sls
+# Description: install Nginx web server
+# usage:
+# salt < target > state.sls nginx
+
+nginx-server:
+# installes ngnix web server
+  pkg.installed:
+    - pkgs:
+      - nginx
+# ensures that nginx service is started
+  service.running:
+     - require:
+       - pkg: nginx-server
+     - names:
+       - nginx	
+	
+# Ubuntu Redis Install
+base:
+	'os: Ubuntu':
+	- match: grain
+	- redis
+	
+	
+# Install Redis
+install_redis:
+  pkg.installed:
+  - name: redis
+
+start_redis:
+  service.running:
+  - name: redis

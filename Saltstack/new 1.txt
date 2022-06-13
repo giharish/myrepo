@@ -1,0 +1,23 @@
+Tenant ID:  e39045a8-374b-4ae9-88d0-a2801daa680f
+App ID: 5966221f-b74b-4625-a020-bc868c864b23
+Secret: BnM7Q~_PXpQkfh9yRdZcl1lNLhiczO.ywGdoK
+Subscription ID: 9b9e3c1c-4980-4444-958f-71abef1992de
+
+
+salt/beacon/win-websvr/service/SNMP     {
+    "SNMP": {
+        "running": false
+    },
+    "_stamp": "2021-11-01T14:37:23.716352",
+    "id": "win-websvr",
+    "service_name": "SNMP"
+}
+
+smtp.from: 'salt-master@example.com'
+smtp.to: admin1@example.com.com; admin2@example.com.com
+smtp.host: smtp.gmail.com
+smtp.username: 'salt-master@example.com'
+smtp.password: 'verybadpass'
+smtp.tls: True
+smtp.subject: 'Salt'
+
